@@ -15,3 +15,5 @@ Next, customise the other settings as you'd like. This will primarily involve ch
 Next, start the bot using `python3 main.py` inside the folder, it will print any error messages that occur. Any servers containing the bot should now be able to use the `/get_characters` command to generate a list.
 
 Note that the bot must be restarted to update config, and updating config will cause it to stop tracking current posts. Due to limitations with the discord API, it may take a few minutes for the command to begin working after starting. This is due to discord using strange, slow systems for global slash commands, and limitations on mixing server-specific commands with global ones.
+
+Additionally, there may be some bugs as python discord libraries are in a state of flux due to recent major decisions by the discord team, which has caused certain developers to step down, and large changes to the way that libraries must operate. Because of this, the program uses the beta release of the py-cord app, which means that there may be bugs or other issues introduced. Unfortunatly this can't be fixed until a stable release supporting the necessary features happens.

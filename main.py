@@ -55,6 +55,8 @@ class RerollCharacterButton(discord.ui.Button):
         await interaction.response.edit_message(
             content=self.view.list_characters(), view=self.view
         )
+        if self.disabled:
+            self.view.stop()
 
 
 class LockButton(discord.ui.Button):
@@ -73,6 +75,7 @@ class LockButton(discord.ui.Button):
         await interaction.response.edit_message(
             content=self.view.list_characters(), view=self.view
         )
+        self.view.stop()
 
 
 @bot.slash_command()
@@ -83,7 +86,33 @@ async def get_characters(ctx):
         CONFIG["characters_given"],
         CONFIG["max_rerolls"],
     )
-    await ctx.respond(view.list_characters(), view=view)
+    await ctx.respond(
+        view.list_characters(),
+        view=view,
+        allowed_mentions=discord.AllowedMentions(replied_user=True),
+    )
+
+
+@bot.user_command(name="Post user list")
+async def get_user_characters(ctx, user):
+    # Check if admin
+    if (
+        isinstance(ctx.author, discord.Member)
+        and ctx.author.guild_permissions.administrator
+    ):
+        view = CharacterSelector(
+            user,
+            CONFIG["characters"],
+            CONFIG["characters_given"],
+            CONFIG["max_rerolls"],
+        )
+        await ctx.respond(
+            view.list_characters(),
+            view=view,
+            allowed_mentions=discord.AllowedMentions(users=True),
+        )
+    else:
+        await ctx.respond("Only administrators can use this", ephemeral=True)
 
 
 # Disabled because as far as I can tell this isn't possible
