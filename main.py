@@ -21,9 +21,13 @@ class CharacterSelector(discord.ui.View):
         self.remaining_tries = max_tries
         self.names = random.sample(characters, self.amount)
 
-        for i, name in enumerate(self.names):
-            self.add_item(RerollCharacterButton(name, i))
-        self.add_item(LockButton())
+        # Only bother adding buttons if starting with rerolls
+        if self.remaining_tries > 0:
+            for i, name in enumerate(self.names):
+                self.add_item(RerollCharacterButton(name, i))
+            self.add_item(LockButton())
+        else:
+            self.timeout = 0.0
 
     def gen_text(self) -> str:
         output = f"**Character Rolls for {self.user.mention}:**\n"
@@ -129,6 +133,7 @@ async def get_user_characters(ctx, user):
     else:
         await ctx.respond("Only administrators can use this", ephemeral=True)
 
+
 @bot.event
 async def on_ready():
     print("Ready!")
@@ -160,8 +165,9 @@ def init() -> None:
     ), "characters_given must be positive and less than 25 due to discord limitations"
     assert config["max_rerolls"] >= 0, "max_rerolls must not be negative"
     assert isinstance(config["characters"], list), "characters must be a list of names"
-    assert (
-        len(config["characters"]) >= config["characters_given"]
+    assert len(config["characters"]) > config["characters_given"] or (
+        len(config["characters"]) == config["characters_given"]
+        and config["max_rerolls"] == 0
     ), "Must be at least as many characters to choose from as go into teams"
     # for name in config["characters"]:
     #    assert isinstance(name, str), "Every item in characters must be a string"
