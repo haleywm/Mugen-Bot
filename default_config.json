@@ -3,10 +3,25 @@
     "characters_given": 3,
     "max_rerolls": 2,
     "characters": [
-        "Tom",
-        "Harry",
-        "Joe",
-        "Mario",
-        "Queen Elizabeth II"
+        {
+            "text": "Tom",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Pacific_Black_Ducks_on_pond_ducking.jpg/220px-Pacific_Black_Ducks_on_pond_ducking.jpg"
+        },
+        {
+            "text": "Harry",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Mallard_drake_.02.jpg/220px-Mallard_drake_.02.jpg"
+        },
+        {
+            "text": "Joe",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Mandarin.duck.arp.jpg/220px-Mandarin.duck.arp.jpg"
+        },
+        {
+            "text": "Mario",
+            "image": ""
+        },
+        {
+            "text": "Queen Elizabeth II",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Evil_Queen_WDW.jpg/170px-Evil_Queen_WDW.jpg"
+        }
     ]
 }

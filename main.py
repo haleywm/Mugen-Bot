@@ -8,7 +8,11 @@ bot = discord.Bot()
 # The character selector window
 class CharacterSelector(discord.ui.View):
     def __init__(
-        self, user: discord.User, characters: list[str], amount: int, max_tries: int
+        self,
+        user: discord.User,
+        characters: list[dict[str, str]],
+        amount: int,
+        max_tries: int,
     ):
         super().__init__(timeout=None)
         self.user = user
@@ -21,18 +25,27 @@ class CharacterSelector(discord.ui.View):
             self.add_item(RerollCharacterButton(name, i))
         self.add_item(LockButton())
 
-    def list_characters(self) -> str:
+    def gen_text(self) -> str:
         output = f"**Character Rolls for {self.user.mention}:**\n"
-        for i, name in enumerate(self.names):
-            output += f"**{i + 1}:** {name}\n"
         output += f"Select a character below to reroll them in your lineup. Remaining rolls: ***{self.remaining_tries}***"
         return output
+
+    def gen_embeds(self) -> list[discord.Embed]:
+        embeds = list()
+        for i, character in enumerate(self.names):
+            embeds.append(
+                discord.Embed(title=f"**{i + 1}:** {character['text']}").set_image(
+                    url=character["image"]
+                )
+            )
+
+        return embeds
 
 
 class RerollCharacterButton(discord.ui.Button):
     def __init__(self, name: str, pos: int):
         super().__init__(
-            label=name,
+            label=name["text"],
             style=discord.ButtonStyle.primary,
         )
         self.pos = pos
@@ -46,14 +59,14 @@ class RerollCharacterButton(discord.ui.Button):
         choose_pool = [x for x in self.view.characters if x not in self.view.names]
         new_name = random.choice(choose_pool)
         self.view.names[self.pos] = new_name
-        self.label = new_name
+        self.label = new_name["text"]
 
         # Checking if out of tries and locking:
         if self.view.remaining_tries <= 0:
             for button in self.view.children:
                 button.disabled = True
         await interaction.response.edit_message(
-            content=self.view.list_characters(), view=self.view
+            content=self.view.gen_text(), view=self.view, embeds=self.view.gen_embeds()
         )
         if self.disabled:
             self.view.stop()
@@ -73,7 +86,7 @@ class LockButton(discord.ui.Button):
         for button in self.view.children:
             button.disabled = True
         await interaction.response.edit_message(
-            content=self.view.list_characters(), view=self.view
+            content=self.view.gen_text(), view=self.view, embeds=self.view.gen_embeds()
         )
         self.view.stop()
 
@@ -87,9 +100,10 @@ async def get_characters(ctx):
         CONFIG["max_rerolls"],
     )
     await ctx.respond(
-        view.list_characters(),
+        view.gen_text(),
         view=view,
         allowed_mentions=discord.AllowedMentions(replied_user=True),
+        embeds=view.gen_embeds(),
     )
 
 
@@ -107,32 +121,13 @@ async def get_user_characters(ctx, user):
             CONFIG["max_rerolls"],
         )
         await ctx.respond(
-            view.list_characters(),
+            view.gen_text(),
             view=view,
             allowed_mentions=discord.AllowedMentions(users=True),
+            embeds=view.gen_embeds(),
         )
     else:
         await ctx.respond("Only administrators can use this", ephemeral=True)
-
-
-# Disabled because as far as I can tell this isn't possible
-
-# @bot.slash_command()
-# async def make_list_for_group(ctx, role: discord.Role):
-#     # Only run by administrators
-#     author = ctx.author
-#     if not (isinstance(author, discord.Member) and author.guild_permissions.administrator):
-#         return
-#     first_send = True
-#     for member in role.members:
-#         print(member)
-#         view = CharacterSelector(member, CONFIG["characters"], CONFIG["characters_given"], CONFIG["max_rerolls"])
-#         if first_send:
-#             first_send = False
-#             await ctx.respond(view.list_characters(), view=view)
-#         else:
-#             await ctx.followup.send(view.list_characters(), view=view)
-
 
 @bot.event
 async def on_ready():
@@ -168,8 +163,8 @@ def init() -> None:
     assert (
         len(config["characters"]) >= config["characters_given"]
     ), "Must be at least as many characters to choose from as go into teams"
-    for name in config["characters"]:
-        assert isinstance(name, str), "Every item in characters must be a string"
+    # for name in config["characters"]:
+    #    assert isinstance(name, str), "Every item in characters must be a string"
 
     global CONFIG
     CONFIG = config

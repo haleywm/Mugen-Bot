@@ -12,6 +12,8 @@ Next, copy `default_config.json` to `config.json`. Edit the `"token": ""` sectio
 
 Next, customise the other settings as you'd like. This will primarily involve changing the names to something else, and changing the other numbers if you want. Note that there must be at least `characters_given` many characters in the list, and `characters_given` can't be higher than 24 due to limits with buttons on discord dialogue. (24 is a lot though so I'm not trying to work around this).
 
+You can add as many characters as you want in the format given. Note that you can give characters with empty URLs, and Discord will just display the character name by itself. Discord also states that embeds should be HTTP only, and while using HTTP links seems to work, I would not rely on it.
+
 Next, start the bot using `python3 main.py` inside the folder, it will print any error messages that occur. Any servers containing the bot should now be able to use the `/get_characters` command to generate a list.
 
 Note that the bot must be restarted to update config, and updating config will cause it to stop tracking current posts. Due to limitations with the discord API, it may take a few minutes for the command to begin working after starting. This is due to discord using strange, slow systems for global slash commands, and limitations on mixing server-specific commands with global ones.
